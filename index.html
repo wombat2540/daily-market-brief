@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 기사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Pretendard:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ─── 토큰 ─────────────────────────────── */
+  :root {
+    --bg:         #F7F5F0;
+    --surface:    #FFFFFF;
+    --border:     #E8E4DC;
+    --text-main:  #1A1A1A;
+    --text-sub:   #7A7469;
+    --text-muted: #B0AAA0;
+    --accent:     #C8392B;       /* 증시 느낌의 레드 포인트 */
+    --accent-2:   #2563EB;
+
+    --radius: 4px;
+    --card-gap: 20px;
+    --transition: 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ─── 리셋 ─────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+    color: var(--text-main);
+    min-height: 100vh;
+    padding: 0 0 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── 헤더 ─────────────────────────────── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 clamp(20px, 5vw, 80px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .header-logo {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--text-main);
+    text-decoration: none;
+  }
+
+  .header-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── 히어로 타이틀 ─────────────────────── */
+  .hero {
+    padding: clamp(48px, 8vw, 96px) clamp(20px, 5vw, 80px) clamp(32px, 5vw, 56px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .hero-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    max-width: 260px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ─── 그리드 ─────────────────────────────── */
+  .grid-wrap {
+    padding: clamp(32px, 5vw, 56px) clamp(20px, 5vw, 80px);
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--card-gap);
+  }
+
+  /* ─── 카드 ─────────────────────────────── */
+  .card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px 28px 26px;
+    transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 40px rgba(0,0,0,0.09);
+    transform: translateY(-2px);
+    border-color: #D4CFC6;
+  }
+
+  /* 워터마크 이모티콘 */
+  .card-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    font-size: 88px;
+    opacity: 0.07;
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+    transition: opacity var(--transition), transform var(--transition);
+  }
+
+  .card:hover .card-watermark {
+    opacity: 0.035;
+    transform: translate(-50%, -60%) scale(1.1);
+  }
+
+  /* 포인트 라인 (상단) */
+  .card-accent-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-color, var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card:hover .card-accent-line {
+    transform: scaleX(1);
+  }
+
+  /* 인덱스 번호 */
+  .card-index {
+    position: absolute;
+    top: 20px;
+    right: 22px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+
+  /* 기본 콘텐츠 레이어 */
+  .card-default {
+    position: relative;
+    z-index: 1;
+    transition: opacity var(--transition), transform var(--transition);
+  }
+
+  .card:hover .card-default {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .card-keyword {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(22px, 2.2vw, 26px);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+    margin-bottom: 10px;
+  }
+
+  .card-industry {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-sub);
+    letter-spacing: 0.04em;
+    background: var(--bg);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  .card-industry::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--card-color, var(--accent));
+    flex-shrink: 0;
+  }
+
+  /* 호버 콘텐츠 레이어 */
+  .card-hover {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 28px 28px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity var(--transition), transform var(--transition);
+    pointer-events: none;
+  }
+
+  .card:hover .card-hover {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .card-hover-keyword {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(18px, 1.8vw, 21px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+
+  .card-summary {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card-summary li {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.65;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .card-summary li::before {
+    content: '—';
+    color: var(--card-color, var(--accent));
+    flex-shrink: 0;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .card-more {
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-more::after {
+    content: '→';
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover .card-more::after {
+    transform: translateX(3px);
+  }
+
+  /* ─── 주목 카드 (1번째 wide) ─────────────── */
+  .card--featured {
+    grid-column: span 2;
+    min-height: 260px;
+  }
+
+  .card--featured .card-keyword {
+    font-size: clamp(28px, 3vw, 36px);
+  }
+
+  .card--featured .card-watermark {
+    font-size: 130px;
+    transform: translate(-40%, -60%);
+  }
+
+  /* ─── 하단 섹션 ─────────────────────────── */
+  .bottom-strip {
+    margin: 0 clamp(20px, 5vw, 80px);
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .bottom-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .bottom-note strong {
+    color: var(--text-sub);
+    font-weight: 500;
+  }
+
+  /* ─── 반응형 ─────────────────────────────── */
+  @media (max-width: 700px) {
+    .card--featured { grid-column: span 1; }
+    .hero { flex-direction: column; align-items: flex-start; }
+    .hero-desc { text-align: left; max-width: 100%; }
+  }
+
+  /* ─── 진입 애니메이션 ─────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* 순서별 딜레이 (JS로도 가능하지만 CSS만으로 처리) */
+  .cards-grid .card:nth-child(1) { animation-delay: 0.05s; }
+  .cards-grid .card:nth-child(2) { animation-delay: 0.12s; }
+  .cards-grid .card:nth-child(3) { animation-delay: 0.19s; }
+  .cards-grid .card:nth-child(4) { animation-delay: 0.26s; }
+  .cards-grid .card:nth-child(5) { animation-delay: 0.33s; }
+  .cards-grid .card:nth-child(6) { animation-delay: 0.40s; }
+</style>
+</head>
+
+<body>
+
+<!-- ── 헤더 ───────────────────────────── -->
+<header>
+  <a class="header-logo" href="#">오늘의 기사</a>
+  <span class="header-date" id="header-date"></span>
+</header>
+
+<!-- ── 히어로 ──────────────────────────── -->
+<section class="hero">
+  <div>
+    <p class="hero-eyebrow">Market Brief</p>
+    <h1 class="hero-title" id="hero-title">
+      <!-- JS로 날짜 주입 -->
+    </h1>
+  </div>
+  <p class="hero-desc">
+    오늘 시장을 움직인<br>
+    핵심 키워드 6개.<br>
+    카드에 마우스를 올려보세요.
+  </p>
+</section>
+
+<!-- ── 카드 그리드 ─────────────────────── -->
+<div class="grid-wrap">
+  <p class="section-label">Today's Keywords — 6 topics</p>
+
+  <div class="cards-grid" id="cards-container">
+    <!-- JS로 렌더링 (또는 서버에서 주입) -->
+  </div>
+</div>
+
+<!-- ── 하단 ───────────────────────────── -->
+<div class="bottom-strip">
+  <p class="bottom-note">
+    <strong>면책 고지</strong><br>
+    본 서비스는 AI가 요약한 뉴스 정보로, 투자 권유가 아닙니다.
+  </p>
+  <p class="bottom-note" style="text-align:right">
+    자동 업데이트 · 매일 오전 7시<br>
+    <strong>오늘의 기사</strong>
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════
+     DATA — 이 부분을 JSON API / GitHub Actions 로 교체
+     ══════════════════════════════════════ -->
+<script>
+/* ───────────────────────────────────────
+   샘플 데이터 (실제 운영 시 외부 JSON으로 교체)
+   각 객체 = 카드 1장
+   ─────────────────────────────────────── */
+const NEWS_DATA = [
+  {
+    keyword:  "AI 반도체 전쟁",
+    industry: "반도체 · 전자",
+    emoji:    "🔬",
+    color:    "#2563EB",
+    featured: true,           // 첫 번째 카드는 wide 처리
+    summary: [
+      "엔비디아·TSMC 수주 경쟁이 격화되며 HBM 메모리 공급 부족 현상이 지속됩니다.",
+      "국내 SK하이닉스·삼성전자의 HBM4 양산 일정이 관건으로 부상했습니다.",
+      "미국의 대중 반도체 수출 규제 강화로 국내 기업의 반사이익 기대가 높아집니다."
+    ]
+  },
+  {
+    keyword:  "금리 동결 신호",
+    industry: "채권 · 금융",
+    emoji:    "🏛️",
+    color:    "#059669",
+    summary: [
+      "연준 의사록에서 '추가 인상 불필요' 기조가 확인돼 채권 시장이 안정됐습니다.",
+      "국내 기준금리 인하 시점이 3분기로 앞당겨질 수 있다는 전망이 나왔습니다.",
+      "금리 민감 업종인 부동산 리츠·건설주가 일제히 강세를 보였습니다."
+    ]
+  },
+  {
+    keyword:  "전기차 수요 둔화",
+    industry: "자동차 · 배터리",
+    emoji:    "🔋",
+    color:    "#D97706",
+    summary: [
+      "테슬라 1분기 인도량이 시장 예상치를 14% 하회해 배터리 업종 전반이 약세입니다.",
+      "국내 배터리 3사(LG·삼성·SK)의 수주 공백 우려가 주가에 반영됐습니다.",
+      "반면 하이브리드차(HEV) 부품 수요는 오히려 증가 추세라 관련주는 견조합니다."
+    ]
+  },
+  {
+    keyword:  "바이오 임상 결과",
+    industry: "바이오 · 헬스케어",
+    emoji:    "💊",
+    color:    "#7C3AED",
+    summary: [
+      "국내 A사 비만치료제 임상 2상 결과가 긍정적으로 발표돼 급등세를 보였습니다.",
+      "글로벌 제약사의 기술이전 협상 소식이 투자심리를 자극하고 있습니다.",
+      "FDA 패스트트랙 지정으로 허가 일정이 1년 단축될 전망입니다."
+    ]
+  },
+  {
+    keyword:  "달러 강세 지속",
+    industry: "환율 · 원자재",
+    emoji:    "💱",
+    color:    "#C8392B",
+    summary: [
+      "달러 인덱스가 1년래 최고치를 기록하며 원·달러 환율이 1,380원을 돌파했습니다.",
+      "수출 대기업은 환차익 기대감이 있으나, 원자재 수입 업종의 원가 부담이 심화됩니다.",
+      "금 가격은 안전자산 수요로 온스당 2,400달러를 상회합니다."
+    ]
+  },
+  {
+    keyword:  "데이터센터 붐",
+    industry: "클라우드 · 인프라",
+    emoji:    "🖥️",
+    color:    "#0891B2",
+    summary: [
+      "마이크로소프트·구글이 아시아 데이터센터 투자를 두 배로 늘린다고 발표했습니다.",
+      "국내 전력 인프라·냉각 장비·케이블 업체들이 직접 수혜주로 주목받습니다.",
+      "데이터센터 전력 소비 급증으로 국내 전력 관련 종목에도 관심이 쏠립니다."
+    ]
+  }
+];
+
+
+/* ───────────────────────────────────────
+   날짜 주입
+   ─────────────────────────────────────── */
+function getTodayKr() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return { full: `${y}.${m}.${d}`, year: y, month: m, day: d };
+}
+
+const today = getTodayKr();
+document.getElementById('header-date').textContent = `${today.full} 오늘의 기사`;
+document.getElementById('hero-title').innerHTML =
+  `${today.year}.<em>${today.month}</em>.${today.day}<br>오늘의 기사`;
+
+
+/* ───────────────────────────────────────
+   카드 렌더링
+   ─────────────────────────────────────── */
+function renderCards(data) {
+  const container = document.getElementById('cards-container');
+  container.innerHTML = '';
+
+  data.forEach((item, i) => {
+    const card = document.createElement('article');
+    card.className = 'card' + (item.featured ? ' card--featured' : '');
+    card.style.setProperty('--card-color', item.color);
+
+    card.innerHTML = `
+      <div class="card-accent-line"></div>
+      <span class="card-index">${String(i + 1).padStart(2, '0')}</span>
+      <div class="card-watermark">${item.emoji}</div>
+
+      <!-- 기본 상태 -->
+      <div class="card-default">
+        <h2 class="card-keyword">${item.keyword}</h2>
+        <span class="card-industry">${item.industry}</span>
+      </div>
+
+      <!-- 호버 상태 -->
+      <div class="card-hover">
+        <p class="card-hover-keyword">${item.keyword}</p>
+        <ul class="card-summary">
+          ${item.summary.map(s => `<li>${s}</li>`).join('')}
+        </ul>
+        <span class="card-more">자세히 보기</span>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+renderCards(NEWS_DATA);
+</script>
+
+</body>
+</html>

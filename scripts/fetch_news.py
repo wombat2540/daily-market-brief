@@ -22,7 +22,7 @@ COLOR_MAP = {
 
 # 2) Gemini로 3줄 요약 생성
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")   # 무료 티어 모델
+model = genai.GenerativeModel("gemini-2.0-flash")   # 무료 티어 모델
 
 def summarize(titles: list[str], industry: str) -> dict:
     prompt = f"""

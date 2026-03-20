@@ -1,399 +1,594 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>오늘의 기사</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Pretendard:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-  /* ─── 토큰 ─────────────────────────────── */
-  :root {
-    --bg:         #F7F5F0;
-    --surface:    #FFFFFF;
-    --border:     #E8E4DC;
-    --text-main:  #1A1A1A;
-    --text-sub:   #7A7469;
-    --text-muted: #B0AAA0;
-    --accent:     #C8392B;       /* 증시 느낌의 레드 포인트 */
-    --accent-2:   #2563EB;
+/* ── 토큰 ───────────────────────────────────────── */
+:root {
+  /* 라이트 모드 - 웹접근성 4.5:1 이상 보장 */
+  --bg:           #F5F4F0;
+  --bg-sub:       #ECEAE4;
+  --surface:      #FFFFFF;
+  --surface-2:    #F0EEE8;
+  --border:       #D6D2C8;
+  --border-hover: #B8B4A8;
 
-    --radius: 4px;
-    --card-gap: 20px;
-    --transition: 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  --text-main:    #1A1916;   /* on white: 16.2:1 */
+  --text-sub:     #4A4740;   /* on white: 7.1:1  */
+  --text-muted:   #6B6760;   /* on white: 4.8:1  */
 
-  /* ─── 리셋 ─────────────────────────────── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  --accent-up:    #C0392B;   /* 상승장 레드 */
+  --accent-dn:    #1A56A0;   /* 하락장 블루 */
+  --accent-neu:   #5C6370;   /* 중립 */
 
-  body {
-    background: var(--bg);
-    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
-    color: var(--text-main);
-    min-height: 100vh;
-    padding: 0 0 80px;
-    -webkit-font-smoothing: antialiased;
-  }
+  --tag-up-bg:    #FEF0EE;
+  --tag-up-text:  #9B2218;
+  --tag-dn-bg:    #EBF2FC;
+  --tag-dn-text:  #154080;
+  --tag-neu-bg:   #EFEFEF;
+  --tag-neu-text: #3A3D42;
 
-  /* ─── 헤더 ─────────────────────────────── */
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 0 clamp(20px, 5vw, 80px);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-  }
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-hover: 0 4px 8px rgba(0,0,0,0.09), 0 12px 32px rgba(0,0,0,0.08);
 
-  .header-logo {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 15px;
-    letter-spacing: 0.06em;
-    color: var(--text-main);
-    text-decoration: none;
-  }
+  --radius: 6px;
+  --max-w: 1080px;
+  --transition: 0.32s cubic-bezier(0.4,0,0.2,1);
+}
 
-  .header-date {
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 0.04em;
-  }
+[data-theme="dark"] {
+  --bg:           #141412;
+  --bg-sub:       #1C1B18;
+  --surface:      #222220;
+  --surface-2:    #2A2926;
+  --border:       #3A3835;
+  --border-hover: #504E4A;
 
-  /* ─── 히어로 타이틀 ─────────────────────── */
-  .hero {
-    padding: clamp(48px, 8vw, 96px) clamp(20px, 5vw, 80px) clamp(32px, 5vw, 56px);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 24px;
-  }
+  --text-main:    #F0EDE6;   /* on #222: 13.8:1 */
+  --text-sub:     #B8B4AA;   /* on #222: 6.2:1  */
+  --text-muted:   #807C74;   /* on #222: 4.6:1  */
 
-  .hero-eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 12px;
-    font-weight: 500;
-  }
+  --accent-up:    #E8614F;
+  --accent-dn:    #5B9BD5;
+  --accent-neu:   #9096A0;
 
-  .hero-title {
-    font-family: 'Noto Serif KR', serif;
-    font-size: clamp(32px, 5vw, 56px);
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    color: var(--text-main);
-  }
+  --tag-up-bg:    #2E1A18;
+  --tag-up-text:  #F08070;
+  --tag-dn-bg:    #142030;
+  --tag-dn-text:  #80B4E8;
+  --tag-neu-bg:   #2A2926;
+  --tag-neu-text: #A0A4AA;
 
-  .hero-title em {
-    font-style: normal;
-    color: var(--accent);
-  }
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-hover: 0 4px 8px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3);
+}
 
-  .hero-desc {
-    font-size: 13px;
-    color: var(--text-sub);
-    line-height: 1.7;
-    max-width: 260px;
-    text-align: right;
-    flex-shrink: 0;
-  }
+/* ── 리셋 ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ─── 그리드 ─────────────────────────────── */
-  .grid-wrap {
-    padding: clamp(32px, 5vw, 56px) clamp(20px, 5vw, 80px);
-  }
+body {
+  background: var(--bg);
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  font-size: 16px;
+  color: var(--text-main);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--transition), color var(--transition);
+}
 
-  .section-label {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 24px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
+/* ── 헤더 ───────────────────────────────────────── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition), border-color var(--transition);
+}
 
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--card-gap);
-  }
+.header-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
 
-  /* ─── 카드 ─────────────────────────────── */
-  .card {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    cursor: pointer;
-    min-height: 220px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 28px 28px 26px;
-    transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
-  }
+.header-logo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
 
-  .card:hover {
-    box-shadow: 0 8px 40px rgba(0,0,0,0.09);
-    transform: translateY(-2px);
-    border-color: #D4CFC6;
-  }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 
-  /* 워터마크 이모티콘 */
-  .card-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -60%);
-    font-size: 88px;
-    opacity: 0.07;
-    pointer-events: none;
-    user-select: none;
-    line-height: 1;
-    transition: opacity var(--transition), transform var(--transition);
-  }
+.header-date {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
 
-  .card:hover .card-watermark {
-    opacity: 0.035;
-    transform: translate(-50%, -60%) scale(1.1);
-  }
+/* 다크모드 토글 */
+.theme-toggle {
+  width: 40px;
+  height: 22px;
+  background: var(--border);
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.25s;
+  flex-shrink: 0;
+}
 
-  /* 포인트 라인 (상단) */
-  .card-accent-line {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--card-color, var(--accent));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: transform 0.25s, background 0.25s;
+}
 
-  .card:hover .card-accent-line {
-    transform: scaleX(1);
-  }
+[data-theme="dark"] .theme-toggle::after {
+  transform: translateX(18px);
+  background: var(--text-main);
+}
 
-  /* 인덱스 번호 */
-  .card-index {
-    position: absolute;
-    top: 20px;
-    right: 22px;
-    font-size: 11px;
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.04em;
-  }
+[data-theme="dark"] .theme-toggle {
+  background: var(--border-hover);
+}
 
-  /* 기본 콘텐츠 레이어 */
-  .card-default {
-    position: relative;
-    z-index: 1;
-    transition: opacity var(--transition), transform var(--transition);
-  }
+/* ── 환율 바 ─────────────────────────────────────── */
+.ticker-bar {
+  background: var(--bg-sub);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  transition: background var(--transition);
+}
 
-  .card:hover .card-default {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.ticker-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
 
-  .card-keyword {
-    font-family: 'Noto Serif KR', serif;
-    font-size: clamp(22px, 2.2vw, 26px);
-    font-weight: 700;
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    color: var(--text-main);
-    margin-bottom: 10px;
-  }
+.ticker-inner::-webkit-scrollbar { display: none; }
 
-  .card-industry {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-sub);
-    letter-spacing: 0.04em;
-    background: var(--bg);
-    padding: 4px 10px;
-    border-radius: 2px;
-  }
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
-  .card-industry::before {
-    content: '';
-    display: block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--card-color, var(--accent));
-    flex-shrink: 0;
-  }
+.ticker-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
 
-  /* 호버 콘텐츠 레이어 */
-  .card-hover {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    padding: 28px 28px 26px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity var(--transition), transform var(--transition);
-    pointer-events: none;
-  }
+.ticker-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
 
-  .card:hover .card-hover {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
+.ticker-change {
+  font-size: 11px;
+  font-weight: 500;
+}
 
-  .card-hover-keyword {
-    font-family: 'Noto Serif KR', serif;
-    font-size: clamp(18px, 1.8vw, 21px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text-main);
-    margin-bottom: 14px;
-    line-height: 1.3;
-  }
+.ticker-change.up   { color: var(--accent-up); }
+.ticker-change.down { color: var(--accent-dn); }
+.ticker-change.neu  { color: var(--text-muted); }
 
-  .card-summary {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+.ticker-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--border);
+  flex-shrink: 0;
+}
 
-  .card-summary li {
-    font-size: 13px;
-    color: var(--text-sub);
-    line-height: 1.65;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-  }
+/* ── 히어로 ─────────────────────────────────────── */
+.hero {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 24px 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--border);
+}
 
-  .card-summary li::before {
-    content: '—';
-    color: var(--card-color, var(--accent));
-    flex-shrink: 0;
-    font-size: 11px;
-    margin-top: 2px;
-  }
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-up);
+  margin-bottom: 10px;
+}
 
-  .card-more {
-    margin-top: 16px;
-    font-size: 11px;
-    color: var(--text-muted);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+.hero-title {
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+}
 
-  .card-more::after {
-    content: '→';
-    transition: transform 0.2s ease;
-  }
+.hero-title em {
+  font-style: normal;
+  color: var(--accent-up);
+}
 
-  .card:hover .card-more::after {
-    transform: translateX(3px);
-  }
+.hero-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-sub);
+  line-height: 1.7;
+  text-align: right;
+  flex-shrink: 0;
+  max-width: 220px;
+}
 
-  /* ─── 주목 카드 (1번째 wide) ─────────────── */
-  .card--featured {
-    grid-column: span 2;
-    min-height: 260px;
-  }
+/* ── 그리드 ─────────────────────────────────────── */
+.grid-wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 36px 24px;
+}
 
-  .card--featured .card-keyword {
-    font-size: clamp(28px, 3vw, 36px);
-  }
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
 
-  .card--featured .card-watermark {
-    font-size: 130px;
-    transform: translate(-40%, -60%);
-  }
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
 
-  /* ─── 하단 섹션 ─────────────────────────── */
-  .bottom-strip {
-    margin: 0 clamp(20px, 5vw, 80px);
-    padding: 24px 0;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
+/* ── 카드 ───────────────────────────────────────── */
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  transition:
+    box-shadow var(--transition),
+    transform var(--transition),
+    border-color var(--transition),
+    background var(--transition);
+  animation: fadeUp 0.45s ease both;
+}
 
-  .bottom-note {
-    font-size: 11px;
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+  border-color: var(--border-hover);
+}
 
-  .bottom-note strong {
-    color: var(--text-sub);
-    font-weight: 500;
-  }
+/* 워터마크 */
+.card-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -62%);
+  font-size: 80px;
+  opacity: 0.06;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  transition: opacity var(--transition), transform var(--transition);
+}
 
-  /* ─── 반응형 ─────────────────────────────── */
-  @media (max-width: 700px) {
-    .card--featured { grid-column: span 1; }
-    .hero { flex-direction: column; align-items: flex-start; }
-    .hero-desc { text-align: left; max-width: 100%; }
-  }
+.card:hover .card-watermark {
+  opacity: 0.03;
+  transform: translate(-50%, -62%) scale(1.08);
+}
 
-  /* ─── 진입 애니메이션 ─────────────────────── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+/* 인덱스 */
+.card-index {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
 
-  .card {
-    animation: fadeUp 0.5s ease both;
-  }
+/* 기본 레이어 */
+.card-default {
+  position: relative;
+  z-index: 1;
+  transition: opacity var(--transition), transform var(--transition);
+}
 
-  /* 순서별 딜레이 (JS로도 가능하지만 CSS만으로 처리) */
-  .cards-grid .card:nth-child(1) { animation-delay: 0.05s; }
-  .cards-grid .card:nth-child(2) { animation-delay: 0.12s; }
-  .cards-grid .card:nth-child(3) { animation-delay: 0.19s; }
-  .cards-grid .card:nth-child(4) { animation-delay: 0.26s; }
-  .cards-grid .card:nth-child(5) { animation-delay: 0.33s; }
-  .cards-grid .card:nth-child(6) { animation-delay: 0.40s; }
+.card:hover .card-default {
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+.card-keyword {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-industry {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-sub);
+  background: var(--surface-2);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.card-industry::before {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--card-color, var(--accent-up));
+  flex-shrink: 0;
+}
+
+/* 방향 태그 */
+.card-direction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}
+
+.card-direction.up  { background: var(--tag-up-bg);  color: var(--tag-up-text); }
+.card-direction.dn  { background: var(--tag-dn-bg);  color: var(--tag-dn-text); }
+.card-direction.neu { background: var(--tag-neu-bg); color: var(--tag-neu-text); }
+
+/* 호버 레이어 */
+.card-hover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--transition), transform var(--transition);
+  pointer-events: none;
+  background: var(--surface);
+}
+
+.card:hover .card-hover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.card-hover-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.card-hover-keyword {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.card-hover-direction {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* 요약 리스트 */
+.card-summary {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex: 1;
+}
+
+.card-summary li {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-sub);
+  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.card-summary li::before {
+  content: '—';
+  color: var(--card-color, var(--accent-up));
+  flex-shrink: 0;
+  font-size: 11px;
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+/* 핵심 경제 지표 */
+.card-econ {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-econ strong {
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+/* featured 카드 */
+.card--featured {
+  grid-column: span 2;
+  min-height: 240px;
+}
+
+.card--featured .card-keyword {
+  font-size: 26px;
+}
+
+.card--featured .card-watermark {
+  font-size: 110px;
+}
+
+/* ── 하단 ───────────────────────────────────────── */
+.footer {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.footer-note {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.footer-note strong {
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+/* ── 애니메이션 ──────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cards-grid .card:nth-child(1) { animation-delay: 0.04s; }
+.cards-grid .card:nth-child(2) { animation-delay: 0.10s; }
+.cards-grid .card:nth-child(3) { animation-delay: 0.16s; }
+.cards-grid .card:nth-child(4) { animation-delay: 0.22s; }
+.cards-grid .card:nth-child(5) { animation-delay: 0.28s; }
+.cards-grid .card:nth-child(6) { animation-delay: 0.34s; }
+
+/* ── 반응형 ─────────────────────────────────────── */
+@media (max-width: 860px) {
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .card--featured { grid-column: span 2; }
+}
+
+@media (max-width: 560px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  .card--featured { grid-column: span 1; }
+  .hero { flex-direction: column; align-items: flex-start; }
+  .hero-desc { text-align: left; max-width: 100%; }
+}
 </style>
 </head>
 
 <body>
 
-<!-- ── 헤더 ───────────────────────────── -->
+<!-- ── 헤더 ──────────────────────────── -->
 <header>
-  <a class="header-logo" href="#">오늘의 기사</a>
-  <span class="header-date" id="header-date"></span>
+  <div class="header-inner">
+    <a class="header-logo" href="#">오늘의 기사</a>
+    <div class="header-right">
+      <span class="header-date" id="header-date"></span>
+      <button class="theme-toggle" id="theme-toggle" aria-label="다크모드 전환"></button>
+    </div>
+  </div>
 </header>
 
-<!-- ── 히어로 ──────────────────────────── -->
+<!-- ── 환율 바 ────────────────────────── -->
+<div class="ticker-bar">
+  <div class="ticker-inner" id="ticker-inner">
+    <!-- JS로 주입 -->
+  </div>
+</div>
+
+<!-- ── 히어로 ─────────────────────────── -->
 <section class="hero">
   <div>
     <p class="hero-eyebrow">Market Brief</p>
-    <h1 class="hero-title" id="hero-title">
-      <!-- JS로 날짜 주입 -->
-    </h1>
+    <h1 class="hero-title" id="hero-title"></h1>
   </div>
   <p class="hero-desc">
     오늘 시장을 움직인<br>
@@ -402,90 +597,203 @@
   </p>
 </section>
 
-<!-- ── 카드 그리드 ─────────────────────── -->
+<!-- ── 카드 그리드 ────────────────────── -->
 <div class="grid-wrap">
   <p class="section-label">Today's Keywords — 6 topics</p>
-
-  <div class="cards-grid" id="cards-container">
-    <!-- JS로 렌더링 (또는 서버에서 주입) -->
-  </div>
+  <div class="cards-grid" id="cards-container"></div>
 </div>
 
-<!-- ── 하단 ───────────────────────────── -->
-<div class="bottom-strip">
-  <p class="bottom-note">
+<!-- ── 푸터 ──────────────────────────── -->
+<footer class="footer">
+  <p class="footer-note">
     <strong>면책 고지</strong><br>
     본 서비스는 AI가 요약한 뉴스 정보로, 투자 권유가 아닙니다.
   </p>
-  <p class="bottom-note" style="text-align:right">
+  <p class="footer-note" style="text-align:right">
     자동 업데이트 · 매일 오전 7시<br>
     <strong>오늘의 기사</strong>
   </p>
-</div>
+</footer>
 
-<!-- ══════════════════════════════════════
-     DATA — 이 부분을 JSON API / GitHub Actions 로 교체
-     ══════════════════════════════════════ -->
 <script>
-/* ───────────────────────────────────────
-   샘플 데이터 (실제 운영 시 외부 JSON으로 교체)
-   각 객체 = 카드 1장
-   ─────────────────────────────────────── */
+/* ──────────────────────────────────────
+   샘플 데이터 (실제 운영 시 fetch('./data/today.json')으로 교체)
+   direction: "up" | "dn" | "neu"
+   econ: 핵심 경제 지표 한 줄
+   ────────────────────────────────────── */
+const NEWS_DATA = [
+  {
+    keyword:   "AI 반도체 전쟁",
+    industry:  "반도체 · 전자",
+    emoji:     "🔬",
+    color:     "#2563EB",
+    featured:  true,
+    direction: "up",
+    dirLabel:  "▲ 상승 전망",
+    econ:      "HBM4 공급가 +18% · 엔비디아 +2.4%",
+    summary: [
+      "엔비디아·TSMC 수주 경쟁 격화로 HBM 메모리 공급 부족이 지속됩니다.",
+      "SK하이닉스·삼성전자 HBM4 양산 일정이 업계 최대 관심사로 부상했습니다.",
+      "미국의 대중 반도체 수출 규제 강화로 국내 기업의 반사이익 기대가 높아집니다."
+    ]
+  },
+  {
+    keyword:   "금리 동결 신호",
+    industry:  "채권 · 금융",
+    emoji:     "🏛️",
+    color:     "#059669",
+    featured:  false,
+    direction: "up",
+    dirLabel:  "▲ 채권 강세",
+    econ:      "미 10년물 4.21% ↓ · 원/달러 1,372원",
+    summary: [
+      "연준 의사록에서 '추가 인상 불필요' 기조가 확인돼 채권 시장이 안정됐습니다.",
+      "국내 기준금리 인하 시점이 3분기로 앞당겨질 수 있다는 전망이 나왔습니다.",
+      "금리 민감 업종인 부동산 리츠·건설주가 일제히 강세를 보였습니다."
+    ]
+  },
+  {
+    keyword:   "전기차 수요 둔화",
+    industry:  "자동차 · 배터리",
+    emoji:     "🔋",
+    color:     "#D97706",
+    featured:  false,
+    direction: "dn",
+    dirLabel:  "▼ 하락 압력",
+    econ:      "테슬라 -4.1% · LG에너지솔루션 -2.8%",
+    summary: [
+      "테슬라 1분기 인도량이 시장 예상치를 14% 하회해 배터리 업종 전반이 약세입니다.",
+      "국내 배터리 3사의 수주 공백 우려가 주가에 반영됐습니다.",
+      "반면 하이브리드차 부품 수요는 오히려 증가 추세라 관련주는 견조합니다."
+    ]
+  },
+  {
+    keyword:   "바이오 임상 급등",
+    industry:  "바이오 · 헬스케어",
+    emoji:     "💊",
+    color:     "#7C3AED",
+    featured:  false,
+    direction: "up",
+    dirLabel:  "▲ 강한 상승",
+    econ:      "비만치료제 섹터 +6.2% · FDA 패스트트랙",
+    summary: [
+      "국내 A사 비만치료제 임상 2상 결과가 긍정적으로 발표돼 급등세를 보였습니다.",
+      "글로벌 제약사의 기술이전 협상 소식이 투자심리를 자극하고 있습니다.",
+      "FDA 패스트트랙 지정으로 허가 일정이 1년 단축될 전망입니다."
+    ]
+  },
+  {
+    keyword:   "달러 강세 지속",
+    industry:  "환율 · 원자재",
+    emoji:     "💱",
+    color:     "#C8392B",
+    featured:  false,
+    direction: "neu",
+    dirLabel:  "— 혼조세",
+    econ:      "DXY 104.8 · 금 $2,412 · WTI $81.3",
+    summary: [
+      "달러 인덱스가 1년래 최고치를 기록하며 원·달러 환율이 1,380원을 돌파했습니다.",
+      "수출 대기업은 환차익 기대감이 있으나, 원자재 수입 업종의 원가 부담이 심화됩니다.",
+      "금 가격은 안전자산 수요로 온스당 2,400달러를 상회합니다."
+    ]
+  },
+  {
+    keyword:   "데이터센터 붐",
+    industry:  "클라우드 · 인프라",
+    emoji:     "🖥️",
+    color:     "#0891B2",
+    featured:  false,
+    direction: "up",
+    dirLabel:  "▲ 상승 전망",
+    econ:      "전력 인프라 섹터 +3.1% · 냉각장비 수혜",
+    summary: [
+      "MS·구글이 아시아 데이터센터 투자를 두 배로 늘린다고 발표했습니다.",
+      "국내 전력 인프라·냉각 장비·케이블 업체들이 직접 수혜주로 주목받습니다.",
+      "데이터센터 전력 소비 급증으로 국내 전력 관련 종목에도 관심이 쏠립니다."
+    ]
+  }
+];
 
-async function init() {
-  const res  = await fetch('./data/today.json');
-  const data = await res.json();
-  renderCards(data);
-}
-init();
+/* 환율 더미 데이터 */
+const TICKER_DATA = [
+  { label: "원/달러",  value: "1,372.40", change: "+3.20", dir: "up" },
+  { label: "원/엔",    value: "9.18",     change: "-0.04", dir: "down" },
+  { label: "원/유로",  value: "1,489.30", change: "+1.80", dir: "up" },
+  { label: "코스피",   value: "2,641.32", change: "+12.40 (+0.47%)", dir: "up" },
+  { label: "코스닥",   value: "858.21",   change: "-4.10 (-0.47%)",  dir: "down" },
+  { label: "S&P500",  value: "5,234.18", change: "+18.60 (+0.36%)", dir: "up" },
+  { label: "WTI",     value: "$81.30",   change: "+0.40",  dir: "up" },
+  { label: "금",       value: "$2,412",   change: "+8.50",  dir: "up" },
+];
 
-/* ───────────────────────────────────────
-   날짜 주입
-   ─────────────────────────────────────── */
+/* ──────────────────────────────────────
+   날짜
+   ────────────────────────────────────── */
 function getTodayKr() {
   const now = new Date();
   const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  return { full: `${y}.${m}.${d}`, year: y, month: m, day: d };
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const d = String(now.getDate()).padStart(2,'0');
+  const days = ['일','월','화','수','목','금','토'];
+  const day = days[now.getDay()];
+  return { y, m, d, day };
 }
 
-const today = getTodayKr();
-document.getElementById('header-date').textContent = `${today.full} 오늘의 기사`;
-document.getElementById('hero-title').innerHTML =
-  `${today.year}.<em>${today.month}</em>.${today.day}<br>오늘의 기사`;
+const { y, m, d, day } = getTodayKr();
+document.getElementById('header-date').textContent = `${y}.${m}.${d} ${day}요일`;
+document.getElementById('hero-title').innerHTML = `${y}.<em>${m}</em>.${d}<br>오늘의 기사`;
 
+/* ──────────────────────────────────────
+   환율 바 렌더
+   ────────────────────────────────────── */
+function renderTicker(data) {
+  const wrap = document.getElementById('ticker-inner');
+  wrap.innerHTML = data.map((item, i) => `
+    ${i > 0 ? '<span class="ticker-divider"></span>' : ''}
+    <span class="ticker-item">
+      <span class="ticker-label">${item.label}</span>
+      <span class="ticker-value">${item.value}</span>
+      <span class="ticker-change ${item.dir === 'up' ? 'up' : item.dir === 'down' ? 'down' : 'neu'}">${item.change}</span>
+    </span>
+  `).join('');
+}
 
-/* ───────────────────────────────────────
-   카드 렌더링
-   ─────────────────────────────────────── */
+renderTicker(TICKER_DATA);
+
+/* ──────────────────────────────────────
+   카드 렌더
+   ────────────────────────────────────── */
 function renderCards(data) {
   const container = document.getElementById('cards-container');
   container.innerHTML = '';
 
   data.forEach((item, i) => {
+    const dirClass = item.direction || 'neu';
     const card = document.createElement('article');
     card.className = 'card' + (item.featured ? ' card--featured' : '');
     card.style.setProperty('--card-color', item.color);
 
     card.innerHTML = `
-      <div class="card-accent-line"></div>
-      <span class="card-index">${String(i + 1).padStart(2, '0')}</span>
+      <span class="card-index">${String(i+1).padStart(2,'0')}</span>
       <div class="card-watermark">${item.emoji}</div>
 
-      <!-- 기본 상태 -->
       <div class="card-default">
         <h2 class="card-keyword">${item.keyword}</h2>
-        <span class="card-industry">${item.industry}</span>
+        <div class="card-meta">
+          <span class="card-industry">${item.industry}</span>
+          <span class="card-direction ${dirClass}">${item.dirLabel}</span>
+        </div>
       </div>
 
-      <!-- 호버 상태 -->
       <div class="card-hover">
-        <p class="card-hover-keyword">${item.keyword}</p>
+        <div class="card-hover-header">
+          <p class="card-hover-keyword">${item.keyword}</p>
+          <span class="card-direction ${dirClass} card-hover-direction">${item.dirLabel}</span>
+        </div>
         <ul class="card-summary">
           ${item.summary.map(s => `<li>${s}</li>`).join('')}
         </ul>
-        <span class="card-more">자세히 보기</span>
+        ${item.econ ? `<div class="card-econ"><strong>핵심 지표</strong>${item.econ}</div>` : ''}
       </div>
     `;
 
@@ -493,7 +801,39 @@ function renderCards(data) {
   });
 }
 
-</script>
+renderCards(NEWS_DATA);
 
+/* ──────────────────────────────────────
+   다크모드 토글
+   ────────────────────────────────────── */
+const html = document.documentElement;
+const toggleBtn = document.getElementById('theme-toggle');
+
+// 시스템 설정 감지
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  html.setAttribute('data-theme', 'dark');
+}
+
+// 로컬스토리지 저장값 우선
+const saved = localStorage.getItem('theme');
+if (saved) html.setAttribute('data-theme', saved);
+
+toggleBtn.addEventListener('click', () => {
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+});
+
+/* ──────────────────────────────────────
+   실제 운영 시 아래 코드로 교체
+   ────────────────────────────────────── */
+// async function init() {
+//   const res  = await fetch('./data/today.json');
+//   const data = await res.json();
+//   renderCards(data);
+// }
+// init();
+</script>
 </body>
 </html>

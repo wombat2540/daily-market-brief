@@ -27,7 +27,17 @@ def summarize(titles, industry):
     res = requests.post(API_URL, json={
         "contents": [{"parts": [{"text": prompt}]}]
     })
-    text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+    
+    # 응답 내용 출력 (디버깅용)
+    print(f"[{industry}] status: {res.status_code}")
+    print(f"[{industry}] response: {res.text[:500]}")
+    
+    data = res.json()
+    if "candidates" not in data:
+        print(f"❌ candidates 없음: {data}")
+        return {"keyword": industry, "summary": ["데이터를 불러오는 중입니다.", "잠시 후 다시 확인해주세요.", ""]}
+    
+    text = data["candidates"][0]["content"]["parts"][0]["text"]
     text = text.strip().replace("```json","").replace("```","")
     return json.loads(text)
 

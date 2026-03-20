@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "keyword": "반도체·전자",
+    "industry": "반도체·전자",
+    "emoji": "🔬",
+    "color": "#2563EB",
+    "featured": true,
+    "summary": [
+      "데이터를 불러오는 중입니다.",
+      "잠시 후 다시 확인해주세요.",
+      ""
+    ]
+  },
+  {
+    "keyword": "채권·금융",
+    "industry": "채권·금융",
+    "emoji": "🏛️",
+    "color": "#059669",
+    "featured": false,
+    "summary": [
+      "데이터를 불러오는 중입니다.",
+      "잠시 후 다시 확인해주세요.",
+      ""
+    ]
+  },
+  {
+    "keyword": "자동차·배터리",
+    "industry": "자동차·배터리",
+    "emoji": "🔋",
+    "color": "#D97706",
+    "featured": false,
+    "summary": [
+      "데이터를 불러오는 중입니다.",
+      "잠시 후 다시 확인해주세요.",
+      ""
+    ]
+  },
+  {
+    "keyword": "바이오·헬스케어",
+    "industry": "바이오·헬스케어",
+    "emoji": "💊",
+    "color": "#7C3AED",
+    "featured": false,
+    "summary": [
+      "데이터를 불러오는 중입니다.",
+      "잠시 후 다시 확인해주세요.",
+      ""
+    ]
+  },
+  {
+    "keyword": "환율·원자재",
+    "industry": "환율·원자재",
+    "emoji": "💱",
+    "color": "#C8392B",
+    "featured": false,
+    "summary": [
+      "데이터를 불러오는 중입니다.",
+      "잠시 후 다시 확인해주세요.",
+      ""
+    ]
+  },
+  {
+    "keyword": "클라우드·인프라",
+    "industry": "클라우드·인프라",
+    "emoji": "🖥️",
+    "color": "#0891B2",
+    "featured": false,
+    "summary": [
+      "데이터를 불러오는 중입니다.",
+      "잠시 후 다시 확인해주세요.",
+      ""
+    ]
+  }
+]

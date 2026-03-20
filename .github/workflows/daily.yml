@@ -17,7 +17,7 @@ jobs:
           python-version: '3.11'
 
       - name: 패키지 설치
-        run: pip install feedparser google-generativeai
+        run: pip install feedparser requests
 
       - name: 뉴스 수집 + 요약 실행
         env:
